@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tang.mybatis.mapper.UserMapper">
+	<resultMap type="User" id="findUserGoodsMap">
+		<id column="id" property="id" />
+		<result property="username" column="username" />
+		<collection property="Orders" ofType="com.tang.mybatis.po.Orders">
+			<id column="order_id" property="id" />
+			<collection property="orderDetail" ofType="com.tang.mybatis.po.OrderDetail">
+				<id column="order_detail_id" property="id" />
+				<result column="item_number" property="itemNumber" />
+				<association property="item" javaType="com.tang.mybatis.po.Item">
+					<id column="item_id" property="id"></id>
+					<result property="itemName" column="item_name" />
+					<result property="itemPrice" column="item_price" />
+				</association>
+			</collection>
+		</collection>
+	</resultMap>
+
+
+	<sql id="query_user_where">
+		<if test="user!= null and user != ''">
+			<if test="user.userName!= null and user.userName != ''">
+				and u.username like '%${user.userName}%'
+			</if>
+			<if test="user.age!= null and user.age != ''">
+				and u.age > #{user.age}
+			</if>
+		</if>
+	</sql>
+	<!-- 通过select 执行数据库的查询 id:标示映射文件中的sql -->
+	<select id="getUserByID" parameterType="int" resultType="User">
+		select *
+		from `USER` where id = #{id}
+	</select>
+	<select id="getUserListByID" parameterType="java.util.List"
+		resultType="User">
+		select * from `USER`
+		<where>
+			<if test="list!=null and list.size() > 0">
+				id in
+				<foreach collection="list" index="index" item="item" open="("
+					separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+	<select id="findUserByName" parameterType="java.lang.String"
+		resultType="User">
+		select * from `USER` where username like
+		CONCAT('%',#{value},'%');
+	</select>
+	<select id="findUser" parameterType="UserVo" resultType="User">
+		select * from `USER` u
+		<where>
+			<include refid="query_user_where" />
+		</where>
+	</select>
+	<select id="findUserByOrder" parameterType="int" resultType="User">
+		select * from `USER` u  where id = #{id}
+	</select>
+	<insert id="insertUser" parameterType="User" useGeneratedKeys="true"
+		keyProperty="id">
+		<selectKey keyProperty="id" order="AFTER" resultType="int">
+			select LAST_INSERT_ID()
+		</selectKey>
+		insert into USER(username,age,sex) values(#{username},#{age},#{sex});
+	</insert>
+	<delete id="deleteUser" parameterType="int">
+		delete from user where id=#{id}
+	</delete>
+	<update id="updateUser" parameterType="User">
+		update user set username=#{username},age=#{age},sex=#{age} where id=#{id}
+	</update>
+	<select id="findUserGoods" resultMap="findUserGoodsMap">
+		SELECT
+		u.id,
+		u.username,
+		o.id AS order_id,
+		od.id AS order_detail_id,
+		od.item_number AS item_number,
+		i.id AS item_id,
+		i.item_name,
+		i.item_price
+		FROM
+		USER u,
+		orders o,
+		orderdetail od,
+		items i
+		WHERE
+		u.id = o.user_id
+		AND o.id = od.order_id
+		AND od.item_id = i.id
+	</select>
+</mapper>

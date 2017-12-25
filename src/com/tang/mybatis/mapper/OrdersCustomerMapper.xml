@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tang.mybatis.mapper.OrdersCustomerMapper">
+	<resultMap id="getOrderCustomerMap" type="com.tang.mybatis.po.Orders">
+		<id property="id" column="id" />
+		<result property="user_id" column="user_id" />
+		<result property="number" column="number" />
+		<result property="creatTime" column="creatTime" />
+		<result property="note" column="note" />
+		<!-- 一对一关系 -->
+		<association property="user" javaType="User">
+			<id  column="user_id" property="id"/>
+			<result property="username" column="username" />
+			<result property="age" column="age" />
+			<result property="sex" column="sex" />
+		</association>
+	</resultMap>
+    <resultMap id="getOrderAndOrderDetailMap" type="com.tang.mybatis.po.Orders" extends="getOrderCustomerMap">
+		 <collection property="orderDetail" ofType="com.tang.mybatis.po.OrderDetail" >
+		    <id column="order_detail_id" property="id" />
+		    <result  column="order_id" property="orderId" />
+		    <result column="item_id" property="itemId" />
+		    <result column="item_number" property="itemNumber"  />
+		 </collection>
+	</resultMap>
+   <select id="getOrderCustomer" parameterType="int" resultMap="getOrderCustomerMap">
+      select  o.* ,u.username,u.age,u.sex from orders o inner join user u on o.user_id=u.id  where o.id=#{id}
+   </select>
+   <select id="getOrderCustomerByResultMap" parameterType="int" resultMap="getOrderCustomerMap">
+      select  o.* ,u.username,u.age,u.sex from orders o inner join user u on o.user_id=u.id  where o.id=#{id}
+   </select>
+   
+   <select id="getOrderAndOrderDetail" resultMap="getOrderAndOrderDetailMap" >
+     select  o.* ,u.username,u.age,u.sex,od.id as order_detail_id,od.order_id,od.item_id,od.item_number from orders o inner join user u on o.user_id=u.id  inner join orderdetail od  on o.id=od.order_id
+   </select>
+ 
+</mapper>

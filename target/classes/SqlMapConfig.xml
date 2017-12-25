@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE configuration  
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+"http://mybatis.org/dtd/mybatis-3-config.dtd">  
+<configuration>  
+
+    <!--  加载属性文件-->  
+    <properties resource="db.properties"></properties> 
+    
+    <!-- 开启延迟加载 -->
+    <settings>
+        <!-- lazyLoadingEnabled:延迟加载启动，默认是false -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!-- aggressiveLazyLoading：积极的懒加载，false的话按需加载，默认是true -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+    </settings> 
+    <!-- 别名 -->
+    <typeAliases>
+  		<typeAlias alias="User" type="com.tang.mybatis.po.User"  />
+  		<typeAlias alias="UserVo" type="com.tang.mybatis.vo.UserVo"  />
+  		<typeAlias alias="OrdersCustomerVo" type="com.tang.mybatis.vo.OrdersCustomer"  />
+  		<typeAlias alias="Orders" type="com.tang.mybatis.po.Orders"  />
+	</typeAliases>
+    <!-- 全局参数配置，在需要时候进行配置 -->  
+    <!-- <settings></settings> -->  
+              
+              
+    <!-- 和spring整合后 environments配置将废除-->  
+    <environments default="development">  
+        <environment id="development">  
+        <!-- 使用jdbc事务管理,事物控制有mybatis控制-->  
+            <transactionManager type="JDBC" />  
+        <!-- 数据库连接池，由mybatis管理-->  
+            <dataSource type="POOLED">  
+                <property name="driver" value="${jdbc.driver}" />  
+                <property name="url" value="${jdbc.url}" />  
+                <property name="username" value="${jdbc.username}" />  
+                <property name="password" value="${jdbc.password}" />  
+            </dataSource>  
+        </environment>  
+    </environments>  
+ 
+ 
+	<mappers>
+	     <!-- // power by http://www.yiibai.com -->
+	     <package name="com.tang.mybatis.mapper"/>
+	</mappers>
+ 
+</configuration>  
